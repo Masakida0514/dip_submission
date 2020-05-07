@@ -1,0 +1,11 @@
+*.pyc
+*~
+__pycache__
+myvenv
+db.sqlite3
+.DS_Store
+<<<<<<< HEAD
+.idea
+=======
+.idea
+>>>>>>> f8184438fc7bbe59e69eacb71196606992662c9a
