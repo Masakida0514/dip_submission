@@ -1,16 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
+{% load static %}
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<meta charset="utf-8">
+<title>dip_task_masakida0514</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="author" content="Six Revisions">
+  <meta name="description" content="How to use the CSS background-size property to make an image fully span the entire viewport.">
+  <link rel="icon" href="http://sixrevisions.com/favicon.ico" type="image/x-icon" />
+  <link href="http://fonts.googleapis.com/css?family=Kotta+One|Cantarell:400,700" rel="stylesheet" type="text/css">
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
 
+  <!-- Not required: presentational-only.css only contains CSS for prettifying the demo -->
+  <link rel="stylesheet" href="{% static 'css/presentational-only.css' %}">
+
+  <!-- responsive-full-background-image.css stylesheet contains the code you want -->
+  <link rel="stylesheet" href="{% static 'css/responsive-full-background-image.css' %}">
+  
+  <!-- Not required: jquery.min.js and presentational-only.js is only used to demonstrate scrolling behavior of the viewport  -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="{% static 'js/presentational-only.js' %}"></script>
+</head>
 <body>
-    <form method="POST" class="post-form" enctype="multipart/form-data">
+  <nav class="navbar" id="top">
+    <div class="inner">
+      <a href="https://github.com/Masakida0514/dip_submission">View code in Github</a>
+    </div>
+  </nav>
+  <header class="container">
+    <section class="content">
+      <h1>Dip_U29_最終課題_Masaki_Mori</h1>
+      <p class="sub-title">
+          ファイル(csv)を選択後、model fit ボタンを押すと(本当に)しばらくしてダウンロードが始まります。<br>
+          たまに505 badgatewayが来ます<br>
+          ファイルが大きいとawsのメモリ(2G)があっという間に消えるので節度のあるファイルを<br>
+          20mb以上のものは弾かれます。
+      </p>
+      <p><a class="button" id="load-more-content" href="#top">押してください</a></p>
+        <form method="POST" class="post-form" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="save btn btn-default">Save</button>
-    </form>
+            <button type="submit">model fit</button>
+        </form>
+      
+      <!-- Some content to demonstrate viewport scrolling behavior -->
+      <div id="more-content">
+        <blockquote>
+            one-hot-encoding, mecabによる形態素解析,及びその出現回数を特徴量にしました。<br>
+            モデルはsklearn.RandomForestRegressorです。LightGBMも使いましたが、パラメーターチューニングで
+            testの精度がいまいち良くならないのでsklearnにしました。<br>
+        </blockquote>
+        <blockquote>
+            one-hot-encodingは結果的に失敗でした。このサイトに乗っかているモデルは不良品（？）のようで、
+            predict-yは全て同じ値になります。おそらく、どのフラグにもかかっていないものが多いのだと思います。
+            ですので反省点はそこです。しかし、前処理をwebアプリで行うとなると、モデル解析ようにカラムを揃える必要が出てくるので
+            その両立が難しかったです。
+        </blockquote>
+        <blockquote>
+            当初はherokuに立てようと思っていましたが、mecabやsklearnによるディスク圧迫が無料分を余裕で超えるので諦めました。
+            形態素解析apiによるディスク軽量化にも挑戦しましたが、実行時間を考えて諦めました。
+            たどり着いたのはawsですが、お金がかかるのはやっぱりネックです。<br>
+            masakida0514@gmail.com
+            <br>
+            ↑に査定が終わったら連絡を下さると嬉しいです。awsのインスタンスを停止します<br>
+            提出したpredictはこれより良いスコアなので、そちらとこのサイトを作った努力を見てくれると嬉しいです。
+            おこがましいかもしれませんが、データサイエンティストインターン生としてご一緒出来る日が来ることを願っています。
+          <cite>
+          Mori Masaki<a href="masakida0514@gmail.com">メールはこちらへ</a>
+          </cite>
+        </blockquote>
+      </div>
+    </section>
+  </header>
 </body>
-
 </html>

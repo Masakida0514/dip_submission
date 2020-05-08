@@ -20,6 +20,8 @@ def process_files(train_x):
     train_x = train_x[train_x_columns.columns]
     del train_x_columns
 
+    work_num = train_x.loc[:, ['お仕事No.', '掲載期間　開始日']]
+
     train_x["掲載期間　開始日"] = pd.to_datetime(train_x["掲載期間　開始日"])
     train_x["掲載期間　終了日"] = pd.to_datetime(train_x["掲載期間　終了日"])
     train_x["期間・時間　勤務開始日"] = pd.to_datetime(train_x["期間・時間　勤務開始日"])
@@ -117,22 +119,25 @@ def process_files(train_x):
     # dataとbagsとdummiesのカラムを解析用に処理+連結
     train_x = transform_columns(bags, train_x)
 
-    return train_x
+    return train_x, work_num
 
 
 def model_loader():
     path = 'submit_app/static/model/'
-    filename = '506_sklearn_randomforest.sav'
+    filename = '508_sklearn_randomforest.sav'
     filename = path + filename
     random_forest = pickle.load(open(filename, 'rb'))
 
     return random_forest
 
 
-def model_fitter(random_forest, data):
-    y_pred = random_forest.predict(data)
+def model_fitter(random_forest, train_x, work_num):
+    train_x.drop('お仕事No.', axis=1, inplace=True)
+    y_pred = random_forest.predict(train_x)
+    del train_x
     submission = pd.DataFrame(y_pred)
-    submission = pd.concat([submission, data['お仕事No.']], axis=1)
+    submission = pd.concat([submission, work_num], axis=1)
+    submission.drop('掲載期間　開始日', axis=1, inplace=True)
     submission.rename(columns={0: '応募数 合計'}, inplace=True)
     submission.set_index('お仕事No.', inplace=True)
 
@@ -142,8 +147,7 @@ def model_fitter(random_forest, data):
 def write_into_csv(csv_data):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="predict_y.csv"'
-    csv_data.to_csv(path_or_buf=response)
-    # , sep=';', float_format='%.2f', index=False,decimal=",")
+    csv_data.to_csv(path_or_buf=response, index=True)
 
     return response
 
