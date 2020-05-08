@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import datetime
+import logging
 
 import MeCab
 from sklearn.feature_extraction.text import CountVectorizer
@@ -81,13 +82,12 @@ def transform(data):
     # 欠損値の補完
     data[cat].fillna('unknown', inplace=True)
     # ダミー変数取得
-    dummies = pd.get_dummies(data, columns=cat)
-    data.drop(cat, axis=1, inplace=True)
+    data = pd.get_dummies(data, columns=cat)
 
-    return data, dummies
+    return data
 
 
-def transform_columns(data, bags, dummies):
+def transform_columns(train_x, bags):
     def common_searcher(df, path):
         columns = pd.read_pickle(path)
         columns_and = set(list(df.columns)) & set(list(columns.columns))
@@ -97,11 +97,11 @@ def transform_columns(data, bags, dummies):
             df[column] = 0
         return df
 
-    path = 'submit_app/static/columns/bags_columns.pickle'
+    path = 'submit_app/static/columns/508_train_x_processed.pickle'
+    train_x = common_searcher(train_x, path)
+    path = 'submit_app/static/columns/508_bags.pickle'
     bags = common_searcher(bags, path)
-    path = 'submit_app/static/columns/dummies_columns.pickle'
-    dummies = common_searcher(dummies, path)
 
-    data = pd.concat([data, bags, dummies], axis=1)
-    data.fillna(0, inplace=True)
-    return data
+    train_x = pd.concat([train_x, bags], axis=1)
+    train_x.fillna(0, inplace=True)
+    return train_x

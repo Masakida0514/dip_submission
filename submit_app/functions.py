@@ -16,7 +16,7 @@ from submit_app.utils import (
 def process_files(train_x):
     # 前処理用に入力ファイルのカラムを整理
     train_x = reduce_mem_usage(train_x)
-    train_x_columns = pd.read_pickle('submit_app/static/columns/train_x_columns.pickle')
+    train_x_columns = pd.read_pickle('submit_app/static/columns/508_train_x_preprocessed.pickle')
     train_x = train_x[train_x_columns.columns]
     del train_x_columns
 
@@ -36,12 +36,15 @@ def process_files(train_x):
         train_x["mecab"] = train_x["mecab"] + ' ' + train_x[nlp].fillna('')
         train_x.drop(nlp, axis=1, inplace=True)
     train_x.drop("休日休暇　備考", axis=1, inplace=True)
+    
+    del nlp_list
 
     # 'mecab'カラムを名詞だけを入れたカラムに更新
     train_x["mecab"] = (train_x["mecab"].apply(split_text_only_noun))
 
     # bagsに名詞の登場回数を格納
     bags = count_vect(train_x["mecab"])
+    # bags = reduce_mem_usage(bags)
     bags = pd.DataFrame(bags)
 
     # 'mecab'カラムの削除
@@ -67,6 +70,7 @@ def process_files(train_x):
     train_x.drop("期間・時間　勤務時間", axis=1, inplace=True)
 
     train_x = pd.concat([train_x, work_time], axis=1)
+    del work_time
 
     # カテゴリ変数化処理
     # 欠損値補完
@@ -79,8 +83,9 @@ def process_files(train_x):
     train_x["（派遣先）勤務先写真ファイル名"] = tmp
 
     # カテゴリ変数化処理したtrain_xとダミー変数化したdummiesを得る
-    train_x, dummies = transform(train_x)
+    train_x = transform(train_x)
 
+    train_x = reduce_mem_usage(train_x)
     # 時系列処理
     tmp_1 = ['掲載期間　開始日', '期間・時間　勤務開始日', '掲載期間　終了日']
     tmp_2 = ['始業', '終業']
@@ -107,12 +112,12 @@ def process_files(train_x):
 
     columns = tmp_1 + tmp_2
     columns.append('拘束時間')
-    data = train_x.drop(columns, axis=1)
+    train_x = train_x.drop(columns, axis=1)
 
     # dataとbagsとdummiesのカラムを解析用に処理+連結
-    data = transform_columns(data, bags, dummies)
+    train_x = transform_columns(bags, train_x)
 
-    return data
+    return train_x
 
 
 def model_loader():
